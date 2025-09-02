@@ -88,10 +88,6 @@ fun F1DriversList(drivers: List<Driver>) {
                             "${driver.driverNumber}. ${driver.broadcastName}",
                             fontSize = 20.sp
                         )
-                        Text(
-                            driver.teamName,
-                            fontSize = 16.sp
-                        )
                     }
                 }
             }
