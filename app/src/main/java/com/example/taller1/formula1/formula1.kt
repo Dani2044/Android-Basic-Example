@@ -8,10 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -86,10 +83,6 @@ fun F1DriversList(drivers: List<Driver>) {
                         .fillMaxWidth()
                         .padding(16.dp)
                 ) {
-                    Icon(
-                        Icons.Default.AccountCircle,
-                        contentDescription = "Driver"
-                    )
                     Column {
                         Text(
                             "${driver.driverNumber}. ${driver.broadcastName}",
