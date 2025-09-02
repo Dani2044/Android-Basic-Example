@@ -127,13 +127,12 @@ fun TicTacToeScreen() {
                                 },
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(8.dp)
-                                    .background(
-                                        if (index in winningLine) colorResource(R.color.win)
-                                        else colorResource(R.color.background)
-                                    ),
+                                    .padding(8.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = colorResource(R.color.background)
+                                    containerColor = if (index in winningLine)
+                                        colorResource(R.color.win) // verde al ganar
+                                    else
+                                        colorResource(R.color.background)
                                 ),
                                 contentPadding = PaddingValues(0.dp)
                             ) {
@@ -143,6 +142,7 @@ fun TicTacToeScreen() {
                                         contentDescription = "X",
                                         modifier = Modifier.size(64.dp)
                                     )
+
                                     "O" -> Image(
                                         painter = painterResource(R.drawable.circle),
                                         contentDescription = "O",

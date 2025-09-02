@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.Button
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -27,9 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.net.URL
 
@@ -60,8 +56,9 @@ fun loadDrivers(): MutableList<Driver> {
 
 @Composable
 fun Formula1Screen(navController: NavController) {
-    var showDrivers by remember { mutableStateOf(false) }
     var drivers by remember { mutableStateOf(emptyList<Driver>()) }
+
+    drivers = loadDrivers()
 
     Scaffold { paddingValues ->
         Column(
@@ -69,35 +66,7 @@ fun Formula1Screen(navController: NavController) {
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            Button(
-                onClick = {
-                    showDrivers = !showDrivers
-                    if (showDrivers && drivers.isEmpty()) {
-                        CoroutineScope(Dispatchers.IO).launch {
-                            val driverList = loadDrivers()
-                            CoroutineScope(Dispatchers.Main).launch {
-                                drivers = driverList
-                            }
-                        }
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text("Show F1 drivers 2025")
-            }
-
-            if (showDrivers) {
-                if (drivers.isEmpty()) {
-                    Text(
-                        "Loading drivers...",
-                        modifier = Modifier.padding(16.dp)
-                    )
-                } else {
-                    F1DriversList(drivers = drivers)
-                }
-            }
+            F1DriversList(drivers = drivers)
         }
     }
 }

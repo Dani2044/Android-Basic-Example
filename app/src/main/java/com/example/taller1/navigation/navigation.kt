@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.composable
 import com.example.taller1.formula1.Formula1Screen
+import com.example.taller1.formula1.F1DetailScreen
 import com.example.taller1.home.HomeScreen
 import com.example.taller1.ticTacToe.TicTacToeScreen
 
@@ -16,10 +17,14 @@ fun Navigation() {
             HomeScreen(navController)
         }
         composable(route = AppScreens.TicTacToe.name) {
-            TicTacToeScreen(navController)
+            TicTacToeScreen()
         }
         composable(route = AppScreens.Formula1.name) {
             Formula1Screen(navController)
+        }
+
+        composable(route = AppScreens.F1Detail.name) {
+            F1DetailScreen()
         }
     }
 }
