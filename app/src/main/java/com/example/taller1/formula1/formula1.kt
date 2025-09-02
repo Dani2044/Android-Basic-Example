@@ -1,5 +1,6 @@
 package com.example.taller1.formula1
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,11 +25,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.taller1.navigation.AppScreens
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.net.URL
+import java.net.URLEncoder
 
 fun loadDrivers(): MutableList<Driver> {
     val driversArray = JSONArray(URL("https://api.openf1.org/v1/drivers?session_key=9684").readText())
@@ -74,19 +77,40 @@ fun Formula1Screen(navController: NavController) {
                 .padding(paddingValues)
                 .fillMaxSize()
         ) {
-            F1DriversList(drivers = drivers)
+            F1DriversList(drivers = drivers, navController = navController)
         }
     }
 }
 
 @Composable
-fun F1DriversList(drivers: List<Driver>) {
+fun F1DriversList(drivers: List<Driver>, navController: NavController) {
     LazyColumn(
         modifier = Modifier.padding(horizontal = 16.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         items(drivers) { driver ->
-            ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        val encodedTeamName = URLEncoder.encode(driver.teamName, "UTF-8")
+                        val encodedNameAcronym = URLEncoder.encode(driver.nameAcronym, "UTF-8")
+                        val encodedFullName = URLEncoder.encode(driver.fullName, "UTF-8")
+                        val encodedCountryCode = URLEncoder.encode(driver.countryCode ?: "", "UTF-8")
+                        val encodedHeadshotUrl = URLEncoder.encode(driver.headshotUrl, "UTF-8")
+                        val encodedTeamColor = URLEncoder.encode(driver.teamColor, "UTF-8")
+
+                        navController.navigate(
+                            "${AppScreens.F1Detail.name}/" +
+                                    "$encodedTeamName/" +
+                                    "$encodedNameAcronym/" +
+                                    "$encodedFullName/" +
+                                    "$encodedCountryCode/" +
+                                    "$encodedHeadshotUrl/" +
+                                    "$encodedTeamColor"
+                        )
+                    }
+            ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp, Alignment.Start),
                     verticalAlignment = Alignment.CenterVertically,
@@ -96,7 +120,7 @@ fun F1DriversList(drivers: List<Driver>) {
                 ) {
                     Column {
                         Text(
-                            "${driver.driverNumber}. ${driver.broadcastName}",
+                            "${driver.driverNumber}. ${driver.fullName}",
                             fontSize = 20.sp
                         )
                     }

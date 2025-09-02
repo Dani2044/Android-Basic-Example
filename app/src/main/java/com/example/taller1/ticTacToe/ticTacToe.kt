@@ -136,18 +136,19 @@ fun TicTacToeScreen() {
                                 ),
                                 contentPadding = PaddingValues(0.dp)
                             ) {
-                                when (board[index]) {
-                                    "X" -> Image(
-                                        painter = painterResource(R.drawable.ex),
-                                        contentDescription = "X",
-                                        modifier = Modifier.size(64.dp)
-                                    )
-
-                                    "O" -> Image(
-                                        painter = painterResource(R.drawable.circle),
-                                        contentDescription = "O",
-                                        modifier = Modifier.size(64.dp)
-                                    )
+                                if (index !in winningLine) {
+                                    when (board[index]) {
+                                        "X" -> Image(
+                                            painter = painterResource(R.drawable.ex),
+                                            contentDescription = "X",
+                                            modifier = Modifier.size(64.dp)
+                                        )
+                                        "O" -> Image(
+                                            painter = painterResource(R.drawable.circle),
+                                            contentDescription = "O",
+                                            modifier = Modifier.size(64.dp)
+                                        )
+                                    }
                                 }
                             }
                         }
