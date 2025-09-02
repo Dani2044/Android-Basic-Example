@@ -1,5 +1,6 @@
 package com.example.taller1.formula1
 
+import android.net.Uri
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,9 +15,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,58 +27,64 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.taller1.navigation.AppScreens
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.net.URL
-import java.net.URLEncoder
 
-fun loadDrivers(): MutableList<Driver> {
-    val driversArray = JSONArray(URL("https://api.openf1.org/v1/drivers?session_key=9684").readText())
-    val drivers = mutableListOf<Driver>()
+private const val OPENF1_SESSION_KEY = 9158
 
-    for (i in 0 until driversArray.length()) {
-        val jsonObject = driversArray.getJSONObject(i)
-        val driver = Driver(
-            meetingKey = jsonObject.getInt("meeting_key"),
-            sessionKey = jsonObject.getInt("session_key"),
-            driverNumber = jsonObject.getInt("driver_number"),
-            broadcastName = jsonObject.getString("broadcast_name"),
-            fullName = jsonObject.getString("full_name"),
-            nameAcronym = jsonObject.getString("name_acronym"),
-            teamName = jsonObject.getString("team_name"),
-            teamColor = jsonObject.getString("team_colour"),
-            firstName = jsonObject.getString("first_name"),
-            lastName = jsonObject.getString("last_name"),
-            headshotUrl = jsonObject.getString("headshot_url"),
-            countryCode = if (jsonObject.isNull("country_code")) null else jsonObject.getString("country_code")
+fun loadDrivers(sessionKey: Int = OPENF1_SESSION_KEY): List<Driver> {
+    val json = URL("https://api.openf1.org/v1/drivers?session_key=$sessionKey").readText()
+    val arr = JSONArray(json)
+    val out = mutableListOf<Driver>()
+    for (i in 0 until arr.length()) {
+        val jo = arr.getJSONObject(i)
+        out += Driver(
+            meetingKey = jo.optInt("meeting_key"),
+            sessionKey = jo.optInt("session_key"),
+            driverNumber = jo.optInt("driver_number"),
+            broadcastName = jo.optString("broadcast_name", ""),
+            fullName = jo.optString("full_name", ""),
+            nameAcronym = jo.optString("name_acronym", ""),
+            teamName = jo.optString("team_name", ""),
+            teamColor = jo.optString("team_colour", ""),
+            firstName = jo.optString("first_name", ""),
+            lastName = jo.optString("last_name", ""),
+            headshotUrl = jo.optString("headshot_url", ""),
+            countryCode = jo.optString("country_code", "")
         )
-        drivers.add(driver)
     }
-    return drivers
+    return out.sortedBy { it.driverNumber }
 }
 
 @Composable
 fun Formula1Screen(navController: NavController) {
-    var drivers by remember { mutableStateOf(emptyList<Driver>()) }
+    var drivers by remember { mutableStateOf<List<Driver>>(emptyList()) }
+    var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        CoroutineScope(Dispatchers.IO).launch {
-            val driverList = loadDrivers()
-            CoroutineScope(Dispatchers.Main).launch {
-                drivers = driverList
-            }
+        try {
+            val loaded = withContext(Dispatchers.IO) { loadDrivers() }
+            drivers = loaded
+        } catch (e: Exception) {
+            error = e.message
+            drivers = emptyList()
+            android.util.Log.e("F1", "Error loading drivers", e)
         }
     }
 
-    Scaffold { paddingValues ->
+    Scaffold { padding ->
         Column(
-            modifier = Modifier
-                .padding(paddingValues)
+            Modifier
+                .padding(padding)
                 .fillMaxSize()
         ) {
-            F1DriversList(drivers = drivers, navController = navController)
+            when {
+                error != null -> Text("Error: $error")
+                drivers.isEmpty() -> Text("Loading…")
+                else -> F1DriversList(drivers, navController)
+            }
         }
     }
 }
@@ -93,22 +100,15 @@ fun F1DriversList(drivers: List<Driver>, navController: NavController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable {
-                        val encodedTeamName = URLEncoder.encode(driver.teamName, "UTF-8")
-                        val encodedNameAcronym = URLEncoder.encode(driver.nameAcronym, "UTF-8")
-                        val encodedFullName = URLEncoder.encode(driver.fullName, "UTF-8")
-                        val encodedCountryCode = URLEncoder.encode(driver.countryCode ?: "", "UTF-8")
-                        val encodedHeadshotUrl = URLEncoder.encode(driver.headshotUrl, "UTF-8")
-                        val encodedTeamColor = URLEncoder.encode(driver.teamColor, "UTF-8")
-
-                        navController.navigate(
-                            "${AppScreens.F1Detail.name}/" +
-                                    "$encodedTeamName/" +
-                                    "$encodedNameAcronym/" +
-                                    "$encodedFullName/" +
-                                    "$encodedCountryCode/" +
-                                    "$encodedHeadshotUrl/" +
-                                    "$encodedTeamColor"
-                        )
+                        val route =
+                            AppScreens.F1Detail.name +
+                                    "?teamName=${Uri.encode(driver.teamName)}" +
+                                    "&nameAcronym=${Uri.encode(driver.nameAcronym)}" +
+                                    "&fullName=${Uri.encode(driver.fullName)}" +
+                                    "&countryCode=${Uri.encode(driver.countryCode ?: "")}" +
+                                    "&headshotUrl=${Uri.encode(driver.headshotUrl)}" +
+                                    "&teamColor=${Uri.encode(driver.teamColor)}"
+                        navController.navigate(route)
                     }
             ) {
                 Row(
@@ -120,7 +120,7 @@ fun F1DriversList(drivers: List<Driver>, navController: NavController) {
                 ) {
                     Column {
                         Text(
-                            "${driver.driverNumber}. ${driver.fullName}",
+                            text = "${driver.driverNumber}. ${driver.fullName}",
                             fontSize = 20.sp
                         )
                     }

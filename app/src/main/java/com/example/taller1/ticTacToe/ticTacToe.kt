@@ -23,9 +23,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -33,22 +36,17 @@ import com.example.taller1.R
 
 @Composable
 fun TicTacToeScreen() {
-    var player by remember {mutableStateOf(true)}
-    var board by remember {mutableStateOf(List(9){""})}
-    var winner by remember {mutableStateOf("")}
-    var winningLine by remember {mutableStateOf(listOf<Int>())}
+    var player by remember { mutableStateOf(true) }
+    var board by remember { mutableStateOf(List(9) { "" }) }
+    var winner by remember { mutableStateOf("") }
+    var winningLine by remember { mutableStateOf(listOf<Int>()) }
     val context = LocalContext.current
 
     fun checkWinner(): Boolean {
         val lines = listOf(
-            listOf(0, 1, 2),
-            listOf(3, 4, 5),
-            listOf(6, 7, 8),
-            listOf(0, 3, 6),
-            listOf(1, 4, 7),
-            listOf(2, 5, 8),
-            listOf(0, 4, 8),
-            listOf(2, 4, 6)
+            listOf(0, 1, 2), listOf(3, 4, 5), listOf(6, 7, 8),
+            listOf(0, 3, 6), listOf(1, 4, 7), listOf(2, 5, 8),
+            listOf(0, 4, 8), listOf(2, 4, 6)
         )
         for (line in lines) {
             val (a, b, c) = line
@@ -62,43 +60,38 @@ fun TicTacToeScreen() {
         return false
     }
 
-    Column (
-        verticalArrangement = Arrangement.spacedBy(92.dp, Alignment.CenterVertically),
+    val primary = colorResource(R.color.primary)
+    val primaryVariant = colorResource(R.color.primary_variant)
+    val bg = colorResource(R.color.background)
+    val winGreen = colorResource(R.color.win)
+    val secondary = colorResource(R.color.secondary)
+    val new = colorResource(R.color.new_button)
+
+    Column(
+        verticalArrangement = Arrangement.SpaceEvenly,
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .background(color = colorResource(R.color.background))
+            .background(color = bg)
             .fillMaxSize()
             .padding(24.dp)
     ) {
-        Row (
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
-        ) {
-            Text(
-                "Turn of player:",
-                color = colorResource(R.color.primary),
-                fontSize = 30.sp
-            )
 
-            Image(
-                painter = painterResource(
-                    if (player) R.drawable.ex else R.drawable.circle
-                ),
-                contentDescription = "Player turn",
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(start = 8.dp)
-            )
-        }
+        Text(
+            text = "PLAYER ONE (X)",
+            color = if (player) primary else secondary,
+            fontSize = 26.sp,
+            fontWeight = FontWeight.Medium,
+            textAlign = TextAlign.Center
+        )
+
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.size(300.dp)
+            modifier = Modifier.size(320.dp)
         ) {
             Image(
                 painter = painterResource(R.drawable.board),
                 contentDescription = "Board",
-                modifier = Modifier.size(300.dp)
+                modifier = Modifier.size(320.dp)
             )
 
             Column(
@@ -114,42 +107,42 @@ fun TicTacToeScreen() {
                     ) {
                         for (col in 0..2) {
                             val index = row * 3 + col
+                            val value = board[index]
+                            val baseCellColor =
+                                if (winner.isNotEmpty() && index in winningLine) winGreen
+                                else primaryVariant
+
                             Button(
                                 onClick = {
-                                    if (board[index].isEmpty()) {
+                                    if (board[index].isEmpty() && winner.isEmpty()) {
                                         board = board.toMutableList().also {
                                             it[index] = if (player) "X" else "O"
                                         }
-                                        if (!checkWinner()) {
-                                            player = !player
-                                        }
+                                        if (!checkWinner()) player = !player
                                     }
                                 },
                                 modifier = Modifier
                                     .weight(1f)
-                                    .padding(8.dp),
+                                    .padding(8.dp)
+                                    .height(84.dp),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (index in winningLine)
-                                        colorResource(R.color.win) // verde al ganar
-                                    else
-                                        colorResource(R.color.background)
+                                    containerColor = baseCellColor,
+                                    contentColor = Color.White
                                 ),
-                                contentPadding = PaddingValues(0.dp)
+                                contentPadding = PaddingValues(0.dp),
+                                elevation = ButtonDefaults.buttonElevation(defaultElevation = 0.dp)
                             ) {
-                                if (index !in winningLine) {
-                                    when (board[index]) {
-                                        "X" -> Image(
-                                            painter = painterResource(R.drawable.ex),
-                                            contentDescription = "X",
-                                            modifier = Modifier.size(64.dp)
-                                        )
-                                        "O" -> Image(
-                                            painter = painterResource(R.drawable.circle),
-                                            contentDescription = "O",
-                                            modifier = Modifier.size(64.dp)
-                                        )
-                                    }
+                                val cellText = when (value) {
+                                    "X" -> "X"
+                                    "O" -> "O"
+                                    else -> ""
                                 }
+                                Text(
+                                    text = cellText,
+                                    fontSize = 28.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center
+                                )
                             }
                         }
                     }
@@ -157,17 +150,35 @@ fun TicTacToeScreen() {
             }
         }
 
-        Button(onClick = {
-            board = List(9) { "" }
-            player = true
-            winner = ""
-            winningLine = emptyList()
-        },
-            modifier = Modifier
-                .height(60.dp)
-                .width(200.dp)
+        Column(
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("New game", fontSize = 20.sp)
+            Text(
+                text = "PLAYER TWO (O)",
+                color = if (!player) primary else secondary,
+                fontSize = 26.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center
+            )
+
+            Button(
+                onClick = {
+                    board = List(9) { "" }
+                    player = true
+                    winner = ""
+                    winningLine = emptyList()
+                },
+                modifier = Modifier
+                    .height(56.dp)
+                    .width(200.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = bg,
+                    contentColor = primary
+                )
+            ) {
+                Text("New Game", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+            }
         }
     }
 }

@@ -25,30 +25,30 @@ fun Navigation() {
             Formula1Screen(navController)
         }
         composable(
-            route = "${AppScreens.F1Detail.name}/{teamName}/{nameAcronym}/{fullName}/{countryCode}/{headshotUrl}/{teamColor}",
+            route =
+                AppScreens.F1Detail.name +
+                        "?teamName={teamName}" +
+                        "&nameAcronym={nameAcronym}" +
+                        "&fullName={fullName}" +
+                        "&countryCode={countryCode}" +
+                        "&headshotUrl={headshotUrl}" +
+                        "&teamColor={teamColor}",
             arguments = listOf(
-                navArgument("teamName") { type = NavType.StringType },
-                navArgument("nameAcronym") { type = NavType.StringType },
-                navArgument("fullName") { type = NavType.StringType },
-                navArgument("countryCode") { type = NavType.StringType },
-                navArgument("headshotUrl") { type = NavType.StringType },
-                navArgument("teamColor") { type = NavType.StringType }
+                navArgument("teamName") { type = NavType.StringType; nullable = true; defaultValue = "" },
+                navArgument("nameAcronym") { type = NavType.StringType; nullable = true; defaultValue = "" },
+                navArgument("fullName") { type = NavType.StringType; nullable = true; defaultValue = "" },
+                navArgument("countryCode") { type = NavType.StringType; nullable = true; defaultValue = "" },
+                navArgument("headshotUrl") { type = NavType.StringType; nullable = true; defaultValue = "" },
+                navArgument("teamColor") { type = NavType.StringType; nullable = true; defaultValue = "" },
             )
         ) { backStackEntry ->
-            val teamName = backStackEntry.arguments?.getString("teamName") ?: ""
-            val nameAcronym = backStackEntry.arguments?.getString("nameAcronym") ?: ""
-            val fullName = backStackEntry.arguments?.getString("fullName") ?: ""
-            val countryCode = backStackEntry.arguments?.getString("countryCode") ?: ""
-            val headshotUrl = backStackEntry.arguments?.getString("headshotUrl") ?: ""
-            val teamColor = backStackEntry.arguments?.getString("teamColor") ?: ""
-
             F1DetailScreen(
-                teamName = teamName,
-                nameAcronym = nameAcronym,
-                fullName = fullName,
-                countryCode = countryCode,
-                headshotUrl = headshotUrl,
-                teamColor = teamColor
+                teamName = backStackEntry.arguments?.getString("teamName") ?: "",
+                nameAcronym = backStackEntry.arguments?.getString("nameAcronym") ?: "",
+                fullName = backStackEntry.arguments?.getString("fullName") ?: "",
+                countryCode = backStackEntry.arguments?.getString("countryCode") ?: "",
+                headshotUrl = backStackEntry.arguments?.getString("headshotUrl") ?: "",
+                teamColor = backStackEntry.arguments?.getString("teamColor") ?: ""
             )
         }
     }
