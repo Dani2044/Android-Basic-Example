@@ -48,53 +48,57 @@ fun F1DetailScreen(
 
     val teamColorParsed = remember(dColor) { parseTeamColor(dColor) }
     val alpha2 = remember(dCty) { alpha3ToAlpha2(dCty) }
-    val flagUrl = alpha2?.let { "https://flagcdn.com/w160/${it.lowercase()}.png" }
+    val flagUrl = alpha2?.let { "https://flagcdn.com/w320/${it.lowercase()}.png" }
 
     Scaffold { padding ->
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(16.dp)
+                .padding(20.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalAlignment = Alignment.Start
+            verticalArrangement = Arrangement.Top,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(if (dPhoto.isBlank()) FALLBACK_HEADSHOT else dPhoto)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "Driver headshot",
-                    modifier = Modifier
-                        .size(120.dp)
-                        .clip(RoundedCornerShape(16.dp)),
-                    contentScale = ContentScale.Crop
-                )
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(if (dPhoto.isBlank()) FALLBACK_HEADSHOT else dPhoto)
+                    .crossfade(true)
+                    .build(),
+                contentDescription = "Driver headshot",
+                modifier = Modifier
+                    .size(160.dp)
+                    .clip(RoundedCornerShape(20.dp)),
+                contentScale = ContentScale.Crop
+            )
 
+            Spacer(Modifier.height(16.dp))
+
+            flagUrl?.let {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
-                        .data(flagUrl)
+                        .data(it)
                         .crossfade(true)
                         .build(),
                     contentDescription = "Country flag",
                     modifier = Modifier
-                        .width(160.dp)
-                        .height(100.dp)
+                        .width(200.dp)
+                        .height(120.dp)
                         .clip(RoundedCornerShape(12.dp)),
                     contentScale = ContentScale.Crop
                 )
             }
 
-            Spacer(Modifier.height(8.dp))
+            Spacer(Modifier.height(24.dp))
 
-            InfoRow(label = "Name:",  value = dName)
-            InfoRow(label = "Team:",  value = dTeam, valueColor = teamColorParsed, boldValue = true)
-            InfoRow(label = "Acronym:", value = dAcr)
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.Start
+            ) {
+                InfoRow(label = "Name:", value = dName)
+                InfoRow(label = "Team:", value = dTeam, valueColor = teamColorParsed, boldValue = true)
+                InfoRow(label = "Acronym:", value = dAcr)
+            }
         }
     }
 }
