@@ -12,6 +12,7 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -23,6 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.net.URL
 
@@ -55,7 +59,14 @@ fun loadDrivers(): MutableList<Driver> {
 fun Formula1Screen(navController: NavController) {
     var drivers by remember { mutableStateOf(emptyList<Driver>()) }
 
-    drivers = loadDrivers()
+    LaunchedEffect(Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            val driverList = loadDrivers()
+            CoroutineScope(Dispatchers.Main).launch {
+                drivers = driverList
+            }
+        }
+    }
 
     Scaffold { paddingValues ->
         Column(
