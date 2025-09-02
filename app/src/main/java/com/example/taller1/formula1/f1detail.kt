@@ -2,6 +2,7 @@ package com.example.taller1.formula1
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,7 +23,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.core.graphics.toColorInt
-import com.example.taller1.R
 
 @Composable
 fun F1DetailScreen(
@@ -41,10 +40,10 @@ fun F1DetailScreen(
     headshotUrl: String,
     teamColor: String
 ) {
-    val dTeam = Uri.decode(teamName)
-    val dAcr = Uri.decode(nameAcronym)
-    val dName = Uri.decode(fullName)
-    val dCty = Uri.decode(countryCode)
+    val dTeam  = Uri.decode(teamName)
+    val dAcr   = Uri.decode(nameAcronym)
+    val dName  = Uri.decode(fullName)
+    val dCty   = Uri.decode(countryCode)
     val dPhoto = Uri.decode(headshotUrl)
     val dColor = Uri.decode(teamColor)
 
@@ -56,45 +55,59 @@ fun F1DetailScreen(
         Column(
             modifier = Modifier
                 .padding(padding)
-                .padding(20.dp)
+                .padding(horizontal = 20.dp, vertical = 16.dp)
                 .fillMaxSize(),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
+            verticalArrangement = Arrangement.SpaceEvenly,
+            horizontalAlignment = Alignment.Start
         ) {
-            AsyncImage(
-                model = ImageRequest.Builder(LocalContext.current)
-                    .data(if (dPhoto.isBlank()) FALLBACK_HEADSHOT else dPhoto)
-                    .crossfade(true)
-                    .build(),
-                contentDescription = "Driver headshot",
+            Row(
                 modifier = Modifier
-                    .size(160.dp)
-                    .clip(RoundedCornerShape(20.dp)),
-                contentScale = ContentScale.Crop
-            )
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                verticalAlignment = Alignment.Top
+            ) {
+                Box(
+                    modifier = Modifier.width(140.dp),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(if (dPhoto.isBlank()) FALLBACK_HEADSHOT else dPhoto)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Driver headshot",
+                        modifier = Modifier
+                            .size(width = 120.dp, height = 140.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
-            Spacer(Modifier.height(16.dp))
-
-            flagUrl?.let {
-                AsyncImage(
-                    model = ImageRequest.Builder(LocalContext.current)
-                        .data(it)
-                        .crossfade(true)
-                        .build(),
-                    contentDescription = "Country flag",
-                    modifier = Modifier
-                        .width(200.dp)
-                        .height(120.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentScale = ContentScale.Crop
-                )
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.TopStart
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(flagUrl)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Country flag",
+                        modifier = Modifier
+                            .width(180.dp)
+                            .height(110.dp)
+                            .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                }
             }
 
-            Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(12.dp))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                verticalArrangement = Arrangement.spacedBy(92.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 InfoRow(label = "Name:", value = dName)
@@ -112,6 +125,7 @@ private fun InfoRow(
     valueColor: Color = Color.Unspecified,
     boldValue: Boolean = false
 ) {
+    val labelBlue = Color(0xFF2196F3)
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -119,14 +133,14 @@ private fun InfoRow(
     ) {
         Text(
             text = label,
-            color = colorResource(R.color.blue),
-            fontSize = 16.sp,
+            color = labelBlue,
+            fontSize = 24.sp,
             fontWeight = FontWeight.SemiBold
         )
         Text(
             text = value.ifBlank { "N/A" },
             color = valueColor,
-            fontSize = 16.sp,
+            fontSize = 24.sp,
             fontWeight = if (boldValue) FontWeight.Medium else FontWeight.Normal
         )
     }
@@ -166,11 +180,11 @@ private const val FALLBACK_HEADSHOT =
 @Composable
 fun F1DetailScreenPreview() {
     F1DetailScreen(
-        teamName = "Red Bull Racing",
-        nameAcronym = "VER",
-        fullName = "Max Verstappen",
-        countryCode = "NED",
+        teamName = "McLaren",
+        nameAcronym = "NOR",
+        fullName = "Lando NORRIS",
+        countryCode = "GBR",
         headshotUrl = "",
-        teamColor = "#1E41FF"
+        teamColor = "F175D51C"
     )
 }

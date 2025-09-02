@@ -64,14 +64,13 @@ fun Formula1Screen(navController: NavController) {
     var error by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(Unit) {
-        try {
-            val loaded = withContext(Dispatchers.IO) { loadDrivers() }
-            drivers = loaded
-        } catch (e: Exception) {
-            error = e.message
-            drivers = emptyList()
-            android.util.Log.e("F1", "Error loading drivers", e)
-        }
+        runCatching { withContext(Dispatchers.IO) { loadDrivers() } }
+            .onSuccess { drivers = it }
+            .onFailure {
+                error = it.message
+                drivers = emptyList()
+                android.util.Log.e("F1", "Error loading drivers", it)
+            }
     }
 
     Scaffold { padding ->
