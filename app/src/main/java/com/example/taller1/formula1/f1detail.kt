@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -29,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.core.graphics.toColorInt
+import com.example.taller1.R
 
 @Composable
 fun F1DetailScreen(
@@ -117,7 +119,7 @@ private fun InfoRow(
     ) {
         Text(
             text = label,
-            color = Color(0xFF2196F3),
+            color = colorResource(R.color.blue),
             fontSize = 16.sp,
             fontWeight = FontWeight.SemiBold
         )
