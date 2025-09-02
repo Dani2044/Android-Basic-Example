@@ -52,7 +52,7 @@ fun HomeScreen(navController: NavController) {
             contentDescription = "F1 Drivers",
             modifier = Modifier
                 .size(250.dp)
-                .clickable { navController.navigate(AppScreens.TicTacToe.name) }
+                .clickable { navController.navigate(AppScreens.Formula1.name) }
         )
     }
 }
